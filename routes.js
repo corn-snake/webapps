@@ -5,4 +5,4 @@ const express = require("express"),
 router.get("/first/", (r,s)=>s.send(utils.time_string(1)));
 router.get("/second/", (r,s)=>s.send(utils.time_string(2)));
 
-router.listen(8080);
+module.exports = router;
