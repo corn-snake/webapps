@@ -10,8 +10,12 @@ const eq = (thing, field="id") => where(field, "==", thing),
     intIfnt = (field, ...exclude)=>!(exclude.includes(field)) ? parseInt : (e)=>e,
     adaptIntEq = (thing, field, ...include)=>eq(intIf(field, ...include)(thing), field),
     adaptIntWithDefault = (field, def, ...exclude)=> exclude.includes(field) ? def : field,
-    queryWhere = async(col, value, field=undefined) => await query(col,eq(value, field)),
-    getSingleDocMatching = async(col, value, field=undefined) => (await getDocs(await queryWhere(col, value,field))).docs[0];
+    queryWhere = (col, value, field=undefined) => query(col,eq(value, field)),
+    multiWhere = (obj)=> [...Object.keys(obj).map(k=>eq(k, obj[k]))],
+    queryMultiWhere = (col, obj)=>query(col, ...multiWhere(obj))
+    getSingleDocMatching = async(col, value, field=undefined) => (await getDocs(queryWhere(col, value,field))).docs[0],
+    getSingleDocMultiMatch = async(col, obj)=>await getDocs(queryMultiWhere(col, obj)).docs[0],
+    getManyDocsMatching = async(col, value, field=undefined)=> (await getDocs(queryWhere(col, value, field))).docs;
 
 const getUser = async(val, type="id") => {
         if (type == "pwd") return false;
@@ -56,11 +60,20 @@ const getUser = async(val, type="id") => {
     })),
 
     deleteUser = async(id)=>await deleteDoc(doc(db, "users", (await getSingleDocMatching(usersDB, parseInt(id))).id)),
-    deleteProd = async (id) => await deleteDoc(doc(db, "products", (await getSingleDocMatching(productsDB, parseInt(id))).id))
+    deleteProd = async (id) => await deleteDoc(doc(db, "products", (await getSingleDocMatching(productsDB, parseInt(id))).id)),
+    deleteReceipt = async(id,prod)=> await deleteDoc(db, "transactions", (await getSingleDocMultiMatch(transactsDB, {
+        id: id,
+        prod_id: prod
+    }))),
+    
+    deleteTransaction = async(id) => (await getManyDocsMatching(transactsDB, parseInt(id))).forEach(e => {
+        await deleteDoc(db, "transactions", e);
+        return true;
+    });
     /*deleteTransaction = async (id) => await deleteDoc(doc(db, "users", (await getSingleDocMatching(usersDB, id, "id")).id))
     
     /*changeUser = async (id, uname, pwdhash) => (await updateDoc(await getSingleDocMatching(usersDB, id, "id"), ))*/;
 
     module.exports = {
-        getUser, getProduct, getTransaction, getAllUsers, getAllProducts, getAllTransactions, makeUser, makeProduct, makeSubReceipt, deleteProd, deleteUser
+        getUser, getProduct, getTransaction, getAllUsers, getAllProducts, getAllTransactions, makeUser, makeProduct, makeSubReceipt, deleteProd, deleteUser, deleteReceipt, deleteTransaction
     }
