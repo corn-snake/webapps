@@ -1,0 +1,32 @@
+.card {
+    display: block;
+    span {
+        display: block;
+        * {
+            display: inline;
+        }
+    }
+}
+
+body {
+    position: absolute;
+    margin: 0;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: 100vw;
+}
+
+.reasonable_padding {
+    padding: 1em;
+}
+
+.half_padding {
+    padding: .75em;
+}
+
+footer {
+    position: absolute;
+    bottom: 0;
+    padding: 1em;
+}
