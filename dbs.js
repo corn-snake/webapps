@@ -1,5 +1,5 @@
 const { collection, getDoc, query, doc, where, getDocs, setDoc, Timestamp, orderBy, limit, addDoc, updateDoc, deleteDoc } = require('firebase/firestore');
-const {db, auth} = require('./../fbinit.js');
+const {db, auth} = require('./fbinit.js');
 
 const usersDB = collection(db, "users"),
     productsDB = collection(db, "products"),
@@ -11,10 +11,10 @@ const eq = (thing, field="id") => where(field, "==", thing),
     adaptIntEq = (thing, field, ...include)=>eq(intIf(field, ...include)(thing), field),
     adaptIntWithDefault = (field, def, ...exclude)=> exclude.includes(field) ? def : field,
     queryWhere = (col, value, field=undefined) => query(col,eq(value, field)),
-    multiWhere = (obj)=> [...Object.keys(obj).map(k=>eq(k, obj[k]))],
+    multiWhere = (obj)=> [...(Object.keys(obj).map(k=>eq(obj[k], k)))],
     queryMultiWhere = (col, obj)=>query(col, ...multiWhere(obj))
     getSingleDocMatching = async(col, value, field=undefined) => (await getDocs(queryWhere(col, value,field))).docs[0],
-    getSingleDocMultiMatch = async(col, obj)=>await getDocs(queryMultiWhere(col, obj)).docs[0],
+    getSingleDocMultiMatch = async(col, obj)=>(await getDocs(queryMultiWhere(col, obj))).docs[0],
     getManyDocsMatching = async(col, value, field=undefined)=> (await getDocs(queryWhere(col, value, field))).docs;
 
 const getUser = async(val, type="id") => {
@@ -53,27 +53,41 @@ const getUser = async(val, type="id") => {
         id: (await getDocs(await query(productsDB, orderBy("id", "desc"), limit(1)))).docs[0].data().id + 1
     })),
     makeSubReceipt = async (amount, buyer, dateString, id, product) => (await addDoc(transactsDB, {
-        amount, buyer,
+        amount, idUsuario: buyer,
         date: Timestamp.fromDate(new Date(dateString)),
-        idn:id,
-        prod_id: product
+        id,
+        idProducto: product,
+        status: "vendido"
     })),
+    makeTransaction = async(buyer, dateString, products)=>{
+        const id = (await getDocs(await query(transactsDB, orderBy("id", "desc"), limit(1)))).docs[0].data().id + 1;
+        Object.keys(products).forEach(async k=>await makeSubReceipt(products[k], buyer, dateString, id, parseInt(k)));
+    },
 
     deleteUser = async(id)=>await deleteDoc(doc(db, "users", (await getSingleDocMatching(usersDB, parseInt(id))).id)),
     deleteProd = async (id) => await deleteDoc(doc(db, "products", (await getSingleDocMatching(productsDB, parseInt(id))).id)),
-    deleteReceipt = async(id,prod)=> await deleteDoc(db, "transactions", (await getSingleDocMultiMatch(transactsDB, {
-        id: id,
-        prod_id: prod
-    }))),
-    
-    deleteTransaction = async(id) => (await getManyDocsMatching(transactsDB, parseInt(id))).forEach(e => {
-        await deleteDoc(db, "transactions", e);
+    deleteReceipt = async(id,prod)=>{
+        const o = {
+            id: parseInt(id), idProducto: parseInt(prod)
+        }
+        const e = await getSingleDocMultiMatch(transactsDB, o);
+        const d = await deleteDoc(doc(db, "transactions", (await e).id));
+        return (await d);
+    },
+    deleteTransaction = async(id) => (await getManyDocsMatching(transactsDB, parseInt(id))).forEach(async e => {
+        await deleteDoc(doc(db, "transactions", e.id));
         return true;
-    });
-    /*deleteTransaction = async (id) => await deleteDoc(doc(db, "users", (await getSingleDocMatching(usersDB, id, "id")).id))
+    }),
+    
+    cancelReceipt = async(id, prod)=> await updateDoc(doc(db, "transactions", (await getSingleDocMultiMatch(transactsDB, {
+        id: parseInt(id), idProducto: parseInt(prod)
+    })).id), {
+        status: "cancelado"
+    }),
+    cancelTransaction = async(id)=> (await getManyDocsMatching(transactsDB, parseInt(id))).forEach(async e=>await updateDoc(doc(db, "transactions", e.id), { status: "cancelado" }));
     
     /*changeUser = async (id, uname, pwdhash) => (await updateDoc(await getSingleDocMatching(usersDB, id, "id"), ))*/;
 
     module.exports = {
-        getUser, getProduct, getTransaction, getAllUsers, getAllProducts, getAllTransactions, makeUser, makeProduct, makeSubReceipt, deleteProd, deleteUser, deleteReceipt, deleteTransaction
+        getUser, getProduct, getTransaction, getAllUsers, getAllProducts, getAllTransactions, makeUser, makeProduct, makeSubReceipt, makeTransaction, deleteProd, deleteUser, cancelReceipt, cancelTransaction
     }
