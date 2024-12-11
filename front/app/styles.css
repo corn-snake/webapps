@@ -1,0 +1,63 @@
+.card {
+    display: block;
+    span {
+        display: block;
+
+        * {
+            display: inline;
+        }
+    }
+}
+
+body {
+    position: absolute;
+    margin: 0;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: 100vw;
+    font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.reasonable_padding {
+    padding: 1em;
+}
+
+.half_padding {
+    padding: .75em;
+}
+
+header,footer {
+    position: relative;
+    padding: 1em;
+    width: calc(100% - 2em);
+    display: block;
+    & > * {
+        display: inline;
+    }
+    * {
+        margin-left: 2em;
+    }
+}
+header {
+    top: 0;
+}
+footer {
+    bottom: 0;
+}
+
+main {
+    width: 94%;
+    padding: 1.5% 3%;
+    position: relative;
+}
+
+.login_form {
+    display: flex;
+    width: 100%;
+    flex-direction: column;
+    align-items:center;
+    * {
+        margin-bottom: 15px;
+    }
+}
