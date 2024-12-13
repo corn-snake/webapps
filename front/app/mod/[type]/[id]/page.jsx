@@ -1,11 +1,18 @@
-"use client";
 import axios from "axios";
-import { useRouter } from "next/navigation";
+import NoDice from "/components/NoDice";
+import { headers } from "next/headers";
+import UpdateButton from "/components/UpdateButton";
+import { dictionary, labels, modOrder, modLabels } from "/res/dictionaries";
 
 const Modify = async ({params}) =>{
-    const rut = useRouter();
-    return <div className="modifier">{await axios.get(`http://localhost:8080/read/${params.type}/id/${params.id}`).then(d=>d.data).then(d=>Object.keys(d).map(it=><><label for={it}>{[it[0].toUpperCase(), ...it.substring(1)]}</label>&nbsp;<input type="text" name={it} id={it} placeholder={d[it]} /></>))}<span onClick={async()=>{
-        await axios.put(`http://localhost:8080/api/mod/${params.type}/${params.id}`).then(r=>rut.push(`/${({prod: "products", users: "user", transaction:"transacts"})[type]}`));
-    }}>Actualizar</span></div>;
+    const h = await headers(),
+        p = await (await params),
+        adm = await axios.get("http://localhost:8080/api/login/checkAdmin", { headers: { "cookie": h.get("cookie") } }).then(d => d.data);
+    if (!(await adm)) return <NoDice/>
+    const data = await (await axios.get(`http://localhost:8080/api/read/${p.type}/id/${p.id}`).then(d => d.data));
+    return <div className="modifier">
+        {modOrder[p.type].map(it => <span key={it}><label htmlFor={it}>{labels[p.type + "s"][it] || modLabels[p.type][it]}</label><input type="text" name={it} id={it} placeholder={it !== "pwd" ? data[it] : ""} /></span>)}
+        <UpdateButton itid={p.id} type={p.type}/>
+    </div>;
 }
 export default Modify;

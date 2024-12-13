@@ -2,4 +2,6 @@ const { changeProduct } = require("../dbs");
 
 const router = require("express").Router();
 
-router.put("/", (r, s) => s.send(changeProduct(r.body)));
+router.patch("/", async(r, s) => s.send(await changeProduct(r.body)));
+
+module.exports = router;

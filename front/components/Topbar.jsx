@@ -4,7 +4,7 @@ const Topbar = ({params}) => <header className="tophead">
     <nav>
         <Link href="/users">Usuarios</Link>
         <Link href="/products">Productos</Link>
-        <Link href="/transacts">Ventas</Link>
+        <Link href="/transactions">Ventas</Link>
     </nav>
 </header>
 export default Topbar;

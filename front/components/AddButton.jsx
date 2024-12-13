@@ -1,14 +1,8 @@
 "use client";
-import axios from "axios";
-import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 const AddButton = ({ type }) => {
-    const [adm, sAdm] = useState(false);
-    const [fin, sFin] = useState("");
-    axios.get("http://localhost:8080/api/login/checkAdmin").then(d => sAdm(d.data));
-    useEffect(() => sFin(adm ?
-        <tr><td><button onClick={() => redirect(`/add/${type}`)}>+ A&ntilde;adir</button></td></tr>
-        : ""), [adm]);
-    return <>{fin}</>;
+    const rut = useRouter();
+    return <button onClick={() => rut.push(`/add/${type}`)}>+ A&ntilde;adir</button>;
 };
 export default AddButton;

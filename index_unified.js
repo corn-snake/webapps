@@ -18,7 +18,7 @@ router.use(session({
     secret: process.env.SEC,
     resave: true,
     saveUninitialized: false,
-    cookie: { maxAge: 3600000 }
+    cookie: { maxAge: 60*60*1000 }
 }));
 
 router.use(require("cors")({ origin: "http://localhost:8080", credentials: true }));
