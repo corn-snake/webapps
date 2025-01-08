@@ -131,7 +131,7 @@ const getUser = async(val, type="id") => {
     
     userExists = async (uname) => await checkFor(usersDB, uname, "uname"),
     uidExists = async (uid)=>(await getSingleDocMatching(usersDB, uid)).exists(),
-    receiptExists = async (idt, idp) => (await getSingleDocMultiMatch(transactsDB, {id: idt, idProducto: idp})).id;
+    receiptExists = async (idt, idp) => (await getSingleDocMultiMatch(transactsDB, {id: idt, idProducto: idp}).then(e=>e.id).catch(er=>false));
 
     module.exports = {
         getSingleDocMatching, getUser, getProduct, getTransaction, getAllUsers, getAllProducts, getAllTransactions, makeUser, makeProduct, makeSubReceipt, makeTransaction, deleteProd, deleteUser, cancelReceipt, cancelTransaction, changeUser, changeProduct, changeReceipt, checkFor, autocomplete, userExists, receiptExists, getReceipt, uidExists
