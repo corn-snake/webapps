@@ -8,7 +8,6 @@ const ListenRoute = () => {
         r = useRouter(),
         [ch, sCh] = useState([pn]);
     useEffect(()=>{
-        console.log(ch, pn)
         if(pn == ch.at(-2)) {
             r.refresh();
             sCh(p=>p.slice(0, -2));

@@ -9,5 +9,6 @@ router.use("/del", require("./delete.js"));
 router.use("/revive", require("./revive/transaction.js"));
 router.use("/mod", require("./modify.js"));
 router.use("/login", require("./login.js"));
+router.use("/search", require("./lookup/autocomplete/autocomplete.js"))
 
 module.exports = router;

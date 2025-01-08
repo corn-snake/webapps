@@ -83,13 +83,12 @@ main {
         max-width: 300px;
         width: 100%;
     }
+    &.hiddenInput {
+        display: none;
+    }
 }
 
 li button {
     display: inline;
     margin: 0 1em;
-}
-
-.hiddenInput {
-    display: none;
 }

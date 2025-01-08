@@ -9,7 +9,8 @@ const dictionary = {
     labels = {
         users: {
             uname: "Usuario", 
-            priv: "Nivel de Acceso"
+            priv: "Nivel de Acceso",
+            name: "Nombre"
         },
         products: {
             price: "Precio ($MXN)",
@@ -30,11 +31,12 @@ const dictionary = {
         }
     },
     order = {
-        users: ["uname", "priv"],
+        users: ["uname", "name", "priv"],
         products: ["name", "price"]
     },
     modOrder = {
-        user: ["uname", "pwd", "priv"],
+        user: ["uname", "pwd", "name", "priv"],
+        privLevels: ["Usuario", "Administrador"],
         product: ["name", "price"],
         receipt: ["idProducto", "amount", "idUsuario", "date", "status"]
     },
@@ -60,7 +62,18 @@ const dictionary = {
     },
     autocompletable = {
         user: [],
-        transaction: ["idProducto", "idUsuario"]
+        transaction: ["idUsuario"],
+        local: {
+            transaction: {
+                status: ["cancelado", "vendido"]
+            }
+        },
+        lookFor: {
+            transaction: {
+                idProducto: "name",
+                idUsuario: "uname"
+            }
+        }
     },
     hide = {
         items: {
@@ -76,6 +89,15 @@ const dictionary = {
             }
         }
     },
+    dont = {
+        transaction: ["idProducto"]
+    },
+    sources = {
+        transaction: {
+            idProducto: "product",
+            idUsuario: "user"
+        }
+    },
     userNumber = async()=>await axios.get("http://localhost:8080/api/all/users").then(d=>d.data).then(d=>d.reduce((p,v)=>{p[v.id] = v.uname; return p;},{})),
     productNumber = async()=>await axios.get("http://localhost:8080/api/all/products").then(d=>d.data).then(d=>d.reduce((p,v)=>{p[v.id] = v.name; return p;},{}));
-export {dictionary, labels, order, modOrder, productNumber, userNumber, modLabels, modFuncs, autocompletable, hide};
+export {dictionary, labels, order, modOrder, productNumber, userNumber, modLabels, modFuncs, autocompletable, hide, sources, dont};
