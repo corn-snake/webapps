@@ -3,7 +3,7 @@ import { _delUser } from "../db/roots/delete.js";
 
 const del = new Router()
     .delete("/:uid", async ctx=>{
-        ctx.response.body = await _delUser(ctx.params.uid);
+        ctx.response.body = await _delUser(ctx.params.uid).then(() =>"Usuario borrado correctamente.");
     });
 
 export default del;
