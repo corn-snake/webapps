@@ -2,5 +2,8 @@
   "imports": {
     "@oak/oak": "jsr:@oak/oak@^17.1.4",
     "mongoose": "npm:mongoose@^8.9.6"
+  },
+  "tasks": {
+    "api": "cd api && deno run --watch --allow-net --allow-read --allow-env --allow-sys --env-file index.js"
   }
 }
